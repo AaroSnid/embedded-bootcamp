@@ -58,6 +58,8 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+uint16_t read_adc();
+
 /* USER CODE END 0 */
 
 /**
@@ -93,15 +95,22 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
+HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+	  adc_data = read_adc();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	 HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
@@ -147,6 +156,20 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+uint16_t read_adc(){
+
+	/*                         start SGL (D0, D1, D2)
+                                   V   V VVV
+*/	uint8_t tx_data[3] = {0b00000001, 0b10000000, 0b00000000};
+	uint8_t rx_data[3] = 0;
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_RESET);
+	HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 3, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
+
+	return (rx_data[1] << 8) | rx_data[2];
+}
 
 /* USER CODE END 4 */
 
