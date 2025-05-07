@@ -105,7 +105,12 @@ HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
   while (1)
   {
 
-	  adc_data = read_adc();
+	  uint16_t adc_data = read_adc();
+
+	  // Logic based on 10 bit signal (max 1023), and servo inputs ranging from 3200 to 6400
+	  uint16_t pwm_signal = 3200 + (adc_data / 1023) * 3200;
+
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_signal);
 
     /* USER CODE END WHILE */
 
@@ -159,9 +164,7 @@ void SystemClock_Config(void)
 
 uint16_t read_adc(){
 
-	/*                         start SGL (D0, D1, D2)
-                                   V   V VVV
-*/	uint8_t tx_data[3] = {0b00000001, 0b10000000, 0b00000000};
+	uint8_t tx_data[3] = {0b00000001, 0b10000000, 0b00000000};
 	uint8_t rx_data[3] = 0;
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_RESET);
