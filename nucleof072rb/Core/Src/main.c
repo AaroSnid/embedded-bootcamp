@@ -108,7 +108,7 @@ HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
 	  uint16_t adc_data = read_adc();
 
 	  // Logic based on 10 bit signal (max 1023), and servo inputs ranging from 3200 to 6400
-	  uint16_t pwm_signal = 3200 + (adc_data / 1023) * 3200;
+	  uint16_t pwm_signal = 3200 + (adc_data / 1023.0) * 3200.0;
 
 	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_signal);
 
