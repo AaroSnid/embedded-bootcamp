@@ -96,7 +96,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
+HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
 
   /* USER CODE END 2 */
 
@@ -164,14 +164,15 @@ void SystemClock_Config(void)
 
 uint16_t read_adc(){
 
-	uint8_t tx_data[3] = {0b00000001, 0b10000000, 0b00000000};
-	uint8_t rx_data[3] = 0;
+	uint8_t tx_data[3] = {0x01, 0x80, 0x00};
+	uint8_t rx_data[3] = {0};
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 	HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 3, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(GPIOB, GPIO_Pin_8, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
 
-	return (rx_data[1] << 8) | rx_data[2];
+	//Eliminates the unknown bits, left-shifts the MSBs, and adds the 8 LSBs
+	return ((rx_data[1] & 0x03) << 8) | rx_data[2];
 }
 
 /* USER CODE END 4 */
